@@ -1,0 +1,9 @@
+api_key= 'wFALtGEGFM0JSbcPI8'
+api_secret= 'GyqfGqF7HwPjDY5cCrlYxMXppNJRcqHlLte3'
+risk= 3
+testnet= 'True'
+stop_loss_price= 10
+leverage= 20
+margin_type= 'isolated'
+no_of_tp = 4
+email= 'kayodeola47@gmail.com'
