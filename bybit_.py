@@ -1,11 +1,8 @@
-
-from telethon import TelegramClient
 import asyncio
 from prettytable import PrettyTable
 import time
 import os
 import random
-import imp
 # Your API ID and API hash
 import tkinter as tk
 import os
@@ -18,6 +15,7 @@ import time
 import sys
 import datetime
 import os
+import types
 from tabulate import tabulate
 from email.message import EmailMessage
 import ssl
@@ -47,7 +45,7 @@ def trade(API_KEY, API_SECRET, symbol, entry_price, take_profit, stop_loss_price
         take_qua = 0.166
     while True:
         close+=1
-        if API_KEY.lower() in usernames:
+        if API_KEY in usernames:
             break
         else:
             print('Subscription expired')
@@ -352,10 +350,25 @@ def save_parameters():
 
 if os.path.exists("parameters.txt"):
     def Filefrom(filename):
-        f = open(filename)
-        global data
-        data = imp.load_source('data', '.\\parameters.txt', f)
-        f.close()
+        """
+        Loads a file with key-value pairs and makes it accessible as a module-like object,
+        removing all quotes from values.
+        """
+        global data  # Define 'data' globally
+        data = types.SimpleNamespace()  # Create a module-like object
+
+        try:
+            with open(filename, "r") as f:
+                for line in f:
+                    key, value = line.strip().split("=")
+                    # Remove quotes from the value
+                    value = value.strip().strip("'\"")
+                    setattr(data, key, value)  # Set attributes dynamically
+        except FileNotFoundError:
+            print(f"{filename} not found.")
+        except ValueError:
+            print("Error parsing the file. Ensure it contains key-value pairs in the format 'key=value'.")
+
 
 
     Filefrom('./parameters.txt')
@@ -365,7 +378,7 @@ if os.path.exists("parameters.txt"):
     stop_loss_prices = data.stop_loss_price
     margin_types= data.margin_type
     testnets = data.testnet
-    no_tps = data.no_of_tp
+    no_tps = 4
     leverages = int(data.leverage)
     emails = data.email
 def save_existing_parameters():
@@ -438,10 +451,24 @@ if os.path.exists("parameters.txt"):
 root.mainloop()
 
 def Filefrom(filename):
-    f = open(filename)
-    global data
-    data = imp.load_source('data', '.\\parameters.txt', f)
-    f.close()
+        """
+        Loads a file with key-value pairs and makes it accessible as a module-like object,
+        removing all quotes from values.
+        """
+        global data  # Define 'data' globally
+        data = types.SimpleNamespace()  # Create a module-like object
+
+        try:
+            with open(filename, "r") as f:
+                for line in f:
+                    key, value = line.strip().split("=")
+                    # Remove quotes from the value
+                    value = value.strip().strip("'\"")
+                    setattr(data, key, value)  # Set attributes dynamically
+        except FileNotFoundError:
+            print(f"{filename} not found.")
+        except ValueError:
+            print("Error parsing the file. Ensure it contains key-value pairs in the format 'key=value'.")
 
 
 Filefrom('./parameters.txt')
@@ -451,15 +478,16 @@ risk = data.risk
 stop_loss_price = data.stop_loss_price
 margin_type= data.margin_type
 testnet = data.testnet
-no_tp = data.no_of_tp
+no_tp = 4
 channel_link = 'https://t.me/+Ru4oHqRiI_5lM2Zk'
 leverage = int(data.leverage)
 email = data.email
 print(f'Risk: {risk}%')
 print(f'Stop Loss Price: {stop_loss_price}%')
 print(f'Leverage: {leverage}%')
+print(risk)
 risk = float(risk) * 0.01
-stop_loss_price = stop_loss_price * 0.01
+stop_loss_price = float(stop_loss_price) * 0.01
 print('Margin Type: ', margin_type)
 
 close = 0
@@ -514,7 +542,7 @@ usernames = [item['fields']['username'] for item in data]
 close = 0
 while True:
     close+=1
-    if API_KEY.lower() in usernames:
+    if API_KEY in usernames:
         print('Valid')
         break
     else:
@@ -564,6 +592,8 @@ while True:
             entry_price = json_data['entry_price']
             close_or = json_data['close_order']
             close_pos = json_data['close_position']
+            print(symbol)
+            print(side)
             if symbol != 'empty' and side != 'empty':   
                 print('Bot has found a profitable trade')
                 t = threading.Thread(target=trade, args=(API_KEY, API_SECRET, symbol, entry_price, take_profit_targets, stop_loss_price, leverage, side, risk, testnet, margin_type, email, no_tp))

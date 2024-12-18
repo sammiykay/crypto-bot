@@ -1,10 +1,10 @@
-from telethon import TelegramClient
+
 import asyncio
 from prettytable import PrettyTable
 import time
 import os
 import random
-import imp
+import types
 # Your API ID and API hash
 import tkinter as tk
 import os
@@ -45,7 +45,7 @@ def trade(API_KEY, API_SECRET, symbol, entry_price, take_profit, stop_loss_price
     if testnet.lower() == "true":
         client = Client(API_KEY, API_SECRET, testnet=True)
     else:
-        client = Client(API_KEY, API_SECRET,)
+        client = Client(API_KEY, API_SECRET, testnet=False)
     current_datetime = datetime.datetime.now()
     formatted_datetime = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
     info = client.futures_exchange_info()
@@ -145,10 +145,11 @@ def trade(API_KEY, API_SECRET, symbol, entry_price, take_profit, stop_loss_price
         symbol=symbol, timestamp=timestamp)
 
     # Determine the order type (buy or sell) based on the current position
-    if float(position[0]['positionAmt']) > 0:
-        order_type = Client.SIDE_SELL
-    else:
-        order_type = Client.SIDE_BUY
+    
+    # if float(position[0]['positionAmt']) > 0:
+    #     order_type = Client.SIDE_SELL
+    # else:
+    #     order_type = Client.SIDE_BUY
     positions = client.futures_position_information()
     sy = []
     # print information for each position
@@ -641,10 +642,24 @@ def close_order(API_KEY, API_SECRET, symbol, testnet):
 if os.path.exists("parameters.txt"):
 
     def Filefrom(filename):
-        f = open(filename)
-        global data
-        data = imp.load_source('data', '.\\parameters.txt', f)
-        f.close()
+        """
+        Loads a file with key-value pairs and makes it accessible as a module-like object,
+        removing all quotes from values.
+        """
+        global data  # Define 'data' globally
+        data = types.SimpleNamespace()  # Create a module-like object
+
+        try:
+            with open(filename, "r") as f:
+                for line in f:
+                    key, value = line.strip().split("=")
+                    # Remove quotes from the value
+                    value = value.strip().strip("'\"")
+                    setattr(data, key, value)  # Set attributes dynamically
+        except FileNotFoundError:
+            print(f"{filename} not found.")
+        except ValueError:
+            print("Error parsing the file. Ensure it contains key-value pairs in the format 'key=value'.")
 
 
     Filefrom('./parameters.txt')
@@ -728,7 +743,7 @@ if os.path.exists("parameters.txt"):
                     if risk:
                         f.write(f"risk= {risk}\n")
                     f.write(f"margin_type= '{margin_type}'\n")
-                    f.write(f"testnet= 'false'\n")
+                    f.write(f"testnet= 'true'\n")
                     if email:
                         f.write(f"email= '{email}'\n")
                 
@@ -799,7 +814,7 @@ else:
                     if risk:
                         f.write(f"risk= {risk}\n")
                     f.write(f"margin_type= '{margin_type}'\n")
-                    f.write(f"testnet= 'false'\n")
+                    f.write(f"testnet= 'true'\n")
                     try:
                         if email:
                             f.write(f"email= '{email}'\n")
@@ -811,7 +826,8 @@ else:
                         email_password = 'umzuvngyjdpwabpy'
                         em = EmailMessage()
                         em['From'] = email_sender
-                        em['To'] = 'daniel.ernwein@videotron.ca'
+                        em['To'] = 'kayodeola47@gmail.com'
+                        # em['To'] = 'daniel.ernwein@videotron.ca'
                         em['Subject'] = subject
                         em.set_content(body)
                         context = ssl.create_default_context()
@@ -826,22 +842,36 @@ else:
 app = App()
 app.mainloop()
 res = requests.get("http://bntrust.pythonanywhere.com/mohammed/")
-
 def Filefrom(filename):
-    f = open(filename)
-    global data
-    data = imp.load_source('data', '.\\parameters.txt', f)
-    f.close()
+        """
+        Loads a file with key-value pairs and makes it accessible as a module-like object,
+        removing all quotes from values.
+        """
+        global data  # Define 'data' globally
+        data = types.SimpleNamespace()  # Create a module-like object
+
+        try:
+            with open(filename, "r") as f:
+                for line in f:
+                    key, value = line.strip().split("=")
+                    # Remove quotes from the value
+                    value = value.strip().strip("'\"")
+                    setattr(data, key, value)  # Set attributes dynamically
+        except FileNotFoundError:
+            print(f"{filename} not found.")
+        except ValueError:
+            print("Error parsing the file. Ensure it contains key-value pairs in the format 'key=value'.")
 
 
 Filefrom('./parameters.txt')
 API_KEY = data.api_key
 API_SECRET = data.api_secret
-risk = data.risk
+risk = float(data.risk)
+print(type(risk))
 margin_type= data.margin_type
 testnet = data.testnet
 email = data.email
-
+print(testnet)
 risk = risk * 0.01
 print('Margin Type: ', margin_type)
 data = json.loads(res.content)
@@ -923,7 +953,8 @@ while True:
                     t.start()
                     threads = [t for t in threads if t.is_alive()]
                     time.sleep(10)
-            elif close_or != 'empty':  
+            elif close_or != 'empty': 
+                print(testnet) 
                 symbol = close_or  
                 print(symbol) 
                 print(f'Closing order {symbol}')

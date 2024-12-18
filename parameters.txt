@@ -1,9 +1,6 @@
-api_key= 'wFALtGEGFM0JSbcPI8'
-api_secret= 'GyqfGqF7HwPjDY5cCrlYxMXppNJRcqHlLte3'
-risk= 3
-testnet= 'True'
-stop_loss_price= 10
-leverage= 20
-margin_type= 'isolated'
-no_of_tp = 4
+api_key= '65116d83c1606b7c3106ca5524254dfe2418a0c69812513d20ad5ac5e3ca0992'
+api_secret= 'cbde385619f9676ee808a842aaba3bc17b9420b195c15712fe61659e02dfae0f'
+risk= 1
+margin_type= 'Cross'
+testnet= 'true'
 email= 'kayodeola47@gmail.com'
