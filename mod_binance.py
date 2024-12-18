@@ -10,6 +10,7 @@ import tkinter as tk
 import os
 import requests
 # create the main window
+
 import json
 from binance.exceptions import BinanceAPIException, BinanceOrderException
 from binance.client import Client
